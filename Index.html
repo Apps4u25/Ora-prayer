@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c5c2b" />
+  <meta name="description" content="Ora — Daily Catholic Prayer, Interactive Rosary & Private Intentions" />
+  <title>Ora • Catholic Prayer</title>
+
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #f8f4ec;
+      --surface: #fffdf8;
+      --surface-alt: #efe8da;
+      --text: #2a241d;
+      --text-muted: #6e6253;
+      --accent: #8b6528;
+      --accent-soft: rgba(139, 101, 40, 0.12);
+      --border: #e3dac9;
+      --shadow: 0 4px 16px rgba(42, 36, 29, 0.06);
+      --prayer-size: 1.15rem;
+    }
+
+    body.dark {
+      --bg: #151310;
+      --surface: #1f1c18;
+      --surface-alt: #2b2620;
+      --text: #efe9de;
+      --text-muted: #a99d8c;
+      --accent: #d4aa5a;
+      --accent-soft: rgba(212, 170, 90, 0.15);
+      --border: #352f27;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .serif {
+      font-family: 'Crimson Pro', Georgia, serif;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-cross {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #installBtn {
+      display: none;
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Main Layout */
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 18px 16px 100px;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Typography */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    h2.section-title {
+      margin: 0 0 8px;
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    .prayer-body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: var(--prayer-size);
+      line-height: 1.65;
+      white-space: pre-line;
+      margin: 12px 0 0;
+    }
+
+    /* Pills & Buttons */
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 15px 18px;
+      border: none;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.08s ease, opacity 0.15s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-alt);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* Rosary Specific */
+    .rosary-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    select.mystery-select {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    .beads-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      margin: 14px 0 6px;
+      min-height: 22px;
+    }
+
+    .bead {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      background: transparent;
+      transition: all 0.18s ease;
+    }
+
+    .bead.large {
+      width: 17px;
+      height: 17px;
+      margin-right: 4px;
+    }
+
+    .bead.done {
+      background: var(--accent);
+    }
+
+    .bead.current {
+      background: var(--accent);
+      transform: scale(1.25);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .rosary-tap-card {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .rosary-footer-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .progress-bar-wrap {
+      height: 6px;
+      background: var(--surface-alt);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    /* Library & Intentions */
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .segmented button {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 9px;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .segmented button.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+
+    input[type="text"], input[type="search"] {
+      flex: 1;
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .prayer-item {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+
+    .prayer-item:last-child {
+      border-bottom: none;
+    }
+
+    .prayer-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      gap: 12px;
+    }
+
+    .prayer-item-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .prayer-item-cat {
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .prayer-item-content {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .prayer-item.open .prayer-item-content {
+      display: block;
+    }
+
+    /* Intentions */
+    .intention-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .intention-row:last-child {
+      border-bottom: none;
+    }
+
+    .intention-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .intention-text {
+      flex: 1;
+      font-size: 0.98rem;
+    }
+
+    .intention-text.answered {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .intention-date {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    /* Bottom Navigation */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 10px 6px 9px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-cross">✝</div>
+      <h1>Ora</h1>
+    </div>
+    <div class="header-actions">
+      <button id="installBtn" class="icon-btn" type="button">Install</button>
+      <button id="darkToggle" class="icon-btn" type="button" aria-label="Toggle dark mode">🌙 Night</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: TODAY -->
+    <section id="tab-today" class="tab-panel active">
+      <div class="card">
+        <div class="eyebrow" id="todayDateLabel">Today</div>
+        <h2 class="section-title" id="todayGreeting">Peace be with you</h2>
+        <p class="muted" id="todayLiturgicalNote"></p>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Daily Rhythm</div>
+        <div class="pill-row" id="dailyTimePills">
+          <button class="pill" data-slot="morning" type="button">Morning</button>
+          <button class="pill" data-slot="angelus" type="button">The Angelus</button>
+          <button class="pill" data-slot="night" type="button">Night Examen</button>
+        </div>
+        <h2 class="section-title" id="dailyPrayerTitle">Morning Offering</h2>
+        <div class="prayer-body" id="dailyPrayerBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Today's Rosary</div>
+        <h2 class="section-title" id="todayMysteryTitle">The Sorrowful Mysteries</h2>
+        <p class="muted" id="todayMysterySub">Recommended for today</p>
+        <button class="btn-primary" id="goToRosaryBtn" type="button" style="margin-top:10px;">
+          Pray Today's Rosary
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: ROSARY -->
+    <section id="tab-rosary" class="tab-panel">
+      <div class="rosary-controls">
+        <select id="mysterySelect" class="mystery-select" aria-label="Select Rosary Mysteries">
+          <option value="joyful">Joyful Mysteries (Mon, Sat)</option>
+          <option value="luminous">Luminous Mysteries (Thu)</option>
+          <option value="sorrowful">Sorrowful Mysteries (Tue, Fri)</option>
+          <option value="glorious">Glorious Mysteries (Wed, Sun)</option>
+        </select>
+        <button id="resetRosaryBtn" class="btn-secondary" type="button">Reset</button>
+      </div>
+
+      <div class="card rosary-tap-card" id="rosaryCard">
+        <div class="eyebrow" id="rosaryBeadLabel">Step 1</div>
+        <h2 class="section-title" id="rosaryStepTitle">Sign of the Cross</h2>
+        <p class="muted" id="rosaryMysteryBanner" style="display:none; font-style:italic; margin: 4px 0 8px;"></p>
+
+        <div class="beads-row" id="rosaryBeadsRow"></div>
+
+        <div class="prayer-body" id="rosaryStepText"></div>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="rosaryProgressFill"></div>
+        </div>
+        <p class="muted" id="rosaryCounterText" style="margin:8px 0 0; font-size:0.8rem; text-align:right;"></p>
+      </div>
+
+      <button class="btn-primary" id="nextBeadBtn" type="button">Next Bead →</button>
+      <div class="rosary-footer-actions">
+        <button class="btn-secondary" id="prevBeadBtn" type="button" style="flex:1;">← Previous</button>
+        <button class="btn-secondary" id="hapticToggleBtn" type="button" style="flex:1;">Vibration: On</button>
+      </div>
+    </section>
+
+    <!-- TAB 3: PRAYERS & INTENTIONS -->
+    <section id="tab-prayers" class="tab-panel">
+      <div class="segmented">
+        <button id="segLibraryBtn" class="active" type="button">Prayer Library</button>
+        <button id="segIntentionsBtn" type="button">My Intentions</button>
+      </div>
+
+      <!-- Library View -->
+      <div id="libraryView">
+        <div class="toolbar">
+          <input type="search" id="prayerSearch" placeholder="Search prayers..." aria-label="Search prayers" />
+          <button class="icon-btn" id="fontDecBtn" type="button" aria-label="Decrease text size">A-</button>
+          <button class="icon-btn" id="fontIncBtn" type="button" aria-label="Increase text size">A+</button>
+        </div>
+        <div class="card" id="prayerListContainer"></div>
+      </div>
+
+      <!-- Intentions View -->
+      <div id="intentionsView" style="display:none;">
+        <div class="card">
+          <div class="eyebrow">Private Prayer List</div>
+          <p class="muted" style="margin-top:0;">Saved privately on this device. Tap the box when a prayer is answered.</p>
+          <form id="intentionForm" class="toolbar" style="margin-bottom:0;">
+            <input type="text" id="intentionInput" placeholder="Add a person or intention..." required />
+            <button class="btn-secondary" type="submit" style="background:var(--accent); color:#fff; border-color:var(--accent);">Add</button>
+          </form>
+        </div>
+        <div class="card" id="intentionsListContainer"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="today" type="button">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <span>Today</span>
+    </button>
+    <button class="nav-btn" data-tab="rosary" type="button">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6"/><path d="M12 16v6m-2-3h4"/></svg>
+      <span>Rosary</span>
+    </button>
+    <button class="nav-btn" data-tab="prayers" type="button">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Prayers</span>
+    </button>
+  </nav>
+
+  <script>
+    // ---------- PRAYER TEXTS ----------
+    const CORE = {
+      signOfCross: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.",
+      creed: "I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; he descended into hell; on the third day he rose again from the dead; he ascended into heaven, and is seated at the right hand of God the Father almighty; from there he will come to judge the living and the dead.\n\nI believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.",
+      ourFather: "Our Father, who art in heaven, hallowed be thy name; thy kingdom come; thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses as we forgive those who trespass against us; and lead us not into temptation, but deliver us from evil. Amen.",
+      hailMary: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou among women, and blessed is the fruit of thy womb, Jesus.\n\nHoly Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.",
+      gloryBe: "Glory be to the Father, and to the Son, and to the Holy Spirit, as it was in the beginning, is now, and ever shall be, world without end. Amen.",
+      fatima: "O my Jesus, forgive us our sins, save us from the fires of hell, lead all souls to Heaven, especially those in most need of Thy mercy. Amen.",
+      hailHolyQueen: "Hail, holy Queen, Mother of mercy, our life, our sweetness, and our hope. To thee do we cry, poor banished children of Eve. To thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us; and after this our exile, show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary.\n\nV. Pray for us, O holy Mother of God.\nR. That we may be made worthy of the promises of Christ.",
+      rosaryClosing: "Let us pray. O God, whose only begotten Son, by His life, death, and resurrection, has purchased for us the rewards of eternal life, grant, we beseech Thee, that meditating upon these mysteries of the Most Holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen.\n\nIn the name of the Father, and of the Son, and of the Holy Spirit. Amen."
+    };
+
+    const DAILY_SLOTS = {
+      morning: {
+        title: "Morning Offering",
+        text: "O Jesus, through the Immaculate Heart of Mary, I offer You my prayers, works, joys, and sufferings of this day for all the intentions of Your Sacred Heart, in union with the Holy Sacrifice of the Mass throughout the world, in reparation for my sins, for the intentions of all our associates, and in particular for the intentions of our Holy Father. Amen."
+      },
+      angelus: {
+        title: "The Angelus",
+        text: "V. The Angel of the Lord declared unto Mary.\nR. And she conceived of the Holy Spirit.\n(Hail Mary...)\n\nV. Behold the handmaid of the Lord.\nR. Be it done unto me according to thy word.\n(Hail Mary...)\n\nV. And the Word was made flesh.\nR. And dwelt among us.\n(Hail Mary...)\n\nV. Pray for us, O holy Mother of God.\nR. That we may be made worthy of the promises of Christ.\n\nLet us pray. Pour forth, we beseech Thee, O Lord, Thy grace into our hearts; that we, to whom the incarnation of Christ, Thy Son, was made known by the message of an angel, may by His passion and cross be brought to the glory of His resurrection, through the same Christ our Lord. Amen."
+      },
+      night: {
+        title: "Night Examen & Prayer",
+        text: "Pause quietly in God's presence:\n1. Thank God for three specific blessings from today.\n2. Ask the Holy Spirit for light to see where you fell short.\n3. Tell God you are sorry and ask His grace for tomorrow.\n\nVisit, we beseech Thee, O Lord, this habitation, and drive far from it all snares of the enemy; let Thy holy angels dwell herein to preserve us in peace, and let Thy blessing be always upon us. Through Christ our Lord. Amen.\n\nMay the almighty and merciful Lord, Father, Son, and Holy Spirit, bless and keep us. Amen."
+      }
+    };
+
+    const MYSTERIES = {
+      joyful: {
+        name: "The Joyful Mysteries",
+        days: "Mondays & Saturdays",
+        decades: [
+          { title: "1. The Annunciation", fruit: "Fruit: Humility — Mary says 'yes' to God's plan." },
+          { title: "2. The Visitation", fruit: "Fruit: Love of Neighbour — Mary hastens to serve Elizabeth." },
+          { title: "3. The Nativity", fruit: "Fruit: Poverty of Spirit — Jesus is born in Bethlehem." },
+          { title: "4. The Presentation", fruit: "Fruit: Obedience — Mary and Joseph offer Jesus in the Temple." },
+          { title: "5. Finding Jesus in the Temple", fruit: "Fruit: Joy in Finding Jesus — Seeking Christ above all." }
+        ]
+      },
+      luminous: {
+        name: "The Luminous Mysteries",
+        days: "Thursdays",
+        decades: [
+          { title: "1. The Baptism of Jesus", fruit: "Fruit: Openness to the Holy Spirit — 'This is my beloved Son.'" },
+          { title: "2. The Wedding at Cana", fruit: "Fruit: To Jesus through Mary — 'Do whatever He tells you.'" },
+          { title: "3. Proclamation of the Kingdom", fruit: "Fruit: Repentance and Trust — The Gospel of mercy." },
+          { title: "4. The Transfiguration", fruit: "Fruit: Desire for Holiness — Christ shines in glory." },
+          { title: "5. Institution of the Eucharist", fruit: "Fruit: Adoration — 'This is My Body, given for you.'" }
+        ]
+      },
+      sorrowful: {
+        name: "The Sorrowful Mysteries",
+        days: "Tuesdays & Fridays",
+        decades: [
+          { title: "1. The Agony in the Garden", fruit: "Fruit: Sorrow for Sin — 'Not my will, but Thine be done.'" },
+          { title: "2. The Scourging at the Pillar", fruit: "Fruit: Purity — Christ suffers patiently for our healing." },
+          { title: "3. The Crowning with Thorns", fruit: "Fruit: Moral Courage — Jesus, the humble King." },
+          { title: "4. The Carrying of the Cross", fruit: "Fruit: Patience in Trials — Taking up our daily cross." },
+          { title: "5. The Crucifixion", fruit: "Fruit: Perseverance & Forgiveness — 'Father, forgive them.'" }
+        ]
+      },
+      glorious: {
+        name: "The Glorious Mysteries",
+        days: "Wednesdays & Sundays",
+        decades: [
+          { title: "1. The Resurrection", fruit: "Fruit: Faith — Christ is risen from the dead!" },
+          { title: "2. The Ascension", fruit: "Fruit: Hope — Setting our hearts on heaven." },
+          { title: "3. The Descent of the Holy Spirit", fruit: "Fruit: Love of God — Strength and fire at Pentecost." },
+          { title: "4. The Assumption of Mary", fruit: "Fruit: Grace of a Happy Death — Mary taken up to glory." },
+          { title: "5. The Coronation of Mary", fruit: "Fruit: Trust in Mary's Intercession — Queen of Heaven and Earth." }
+        ]
+      }
+    };
+
+    const PRAYERS_LIBRARY = [
+      { title: "Our Father", category: "Essential", text: CORE.ourFather },
+      { title: "Hail Mary", category: "Essential", text: CORE.hailMary },
+      { title: "Glory Be", category: "Essential", text: CORE.gloryBe },
+      { title: "Act of Contrition", category: "Confession & Mercy", text: "O my God, I am heartily sorry for having offended Thee, and I detest all my sins because of Thy just punishments, but most of all because they offend Thee, my God, who art all good and deserving of all my love. I firmly resolve with the help of Thy grace to sin no more and to avoid the near occasion of sin. Amen." },
+      { title: "Morning Offering", category: "Daily", text: DAILY_SLOTS.morning.text },
+      { title: "The Angelus", category: "Daily", text: DAILY_SLOTS.angelus.text },
+      { title: "Memorare", category: "Marian", text: "Remember, O most gracious Virgin Mary, that never was it known that anyone who fled to thy protection, implored thy help, or sought thine intercession was left unaided. Inspired by this confidence, I fly unto thee, O Virgin of virgins, my mother; to thee do I come, before thee I stand, sinful and sorrowful. O Mother of the Word Incarnate, despise not my petitions, but in thy mercy hear and answer me. Amen." },
+      { title: "Hail, Holy Queen", category: "Marian", text: CORE.hailHolyQueen },
+      { title: "Prayer to St. Michael", category: "Protection", text: "St. Michael the Archangel, defend us in battle. Be our defence against the wickedness and snares of the Devil. May God rebuke him, we humbly pray, and do thou, O Prince of the heavenly hosts, by the power of God, thrust into hell Satan, and all the evil spirits, who prowl about the world seeking the ruin of souls. Amen." },
+      { title: "Come, Holy Spirit", category: "Essential", text: "Come, Holy Spirit, fill the hearts of your faithful and kindle in them the fire of your love. Send forth your Spirit and they shall be created. And You shall renew the face of the earth.\n\nO, God, who by the light of the Holy Spirit, did instruct the hearts of the faithful, grant that by the same Holy Spirit we may be truly wise and ever enjoy His consolations. Through Christ Our Lord. Amen." },
+      { title: "Anima Christi", category: "After Communion", text: "Soul of Christ, sanctify me.\nBody of Christ, save me.\nBlood of Christ, inebriate me.\nWater from the side of Christ, wash me.\nPassion of Christ, strengthen me.\nO good Jesus, hear me.\nWithin Your wounds hide me.\nSeparated from You, let me never be.\nFrom the evil one protect me.\nAt the hour of my death, call me.\nAnd close to You bid me,\nThat with Your saints I may be praising You forever and ever. Amen." },
+      { title: "Grace Before Meals", category: "Daily", text: "Bless us, O Lord, and these Thy gifts, which we are about to receive from Thy bounty, through Christ our Lord. Amen." },
+      { title: "Guardian Angel Prayer", category: "Daily", text: "Angel of God, my guardian dear, to whom God's love commits me here, ever this day be at my side, to light and guard, to rule and guide. Amen." }
+    ];
+
+    // ---------- STATE ----------
+    function getTodaysMysteryKey() {
+      const day = new Date().getDay(); // 0=Sun..6=Sat
+      if (day === 1 || day === 6) return "joyful";
+      if (day === 4) return "luminous";
+      if (day === 2 || day === 5) return "sorrowful";
+      return "glorious";
+    }
+
+    const state = {
+      dark: localStorage.getItem("ora_dark") === "true",
+      fontSize: parseFloat(localStorage.getItem("ora_font")) || 1.15,
+      haptic: localStorage.getItem("ora_haptic") !== "false",
+      mysteryKey: localStorage.getItem("ora_mystery") || getTodaysMysteryKey(),
+      rosaryStep: parseInt(localStorage.getItem("ora_rosary_step") || "0", 10),
+      intentions: JSON.parse(localStorage.getItem("ora_intentions") || "[]")
+    };
+
+    // ---------- THEME & FONT ----------
+    function applyTheme() {
+      document.body.classList.toggle("dark", state.dark);
+      document.getElementById("darkToggle").textContent = state.dark ? "☀️ Light" : "🌙 Night";
+      localStorage.setItem("ora_dark", state.dark);
+    }
+
+    function applyFontSize() {
+      document.documentElement.style.setProperty("--prayer-size", state.fontSize + "rem");
+      localStorage.setItem("ora_font", state.fontSize);
+    }
+
+    document.getElementById("darkToggle").addEventListener("click", () => {
+      state.dark = !state.dark;
+      applyTheme();
+    });
+
+    document.getElementById("fontIncBtn").addEventListener("click", () => {
+      state.fontSize = Math.min(1.65, +(state.fontSize + 0.1).toFixed(2));
+      applyFontSize();
+    });
+
+    document.getElementById("fontDecBtn").addEventListener("click", () => {
+      state.fontSize = Math.max(0.95, +(state.fontSize - 0.1).toFixed(2));
+      applyFontSize();
+    });
+
+    // ---------- NAVIGATION ----------
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById("tab-" + tabName).classList.add("active");
+      document.querySelectorAll(".nav-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.tab === tabName);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
+
+    // ---------- TODAY TAB ----------
+    function initTodayTab() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+      document.getElementById("todayDateLabel").textContent = dateStr;
+
+      const hour = now.getHours();
+      let greeting = "Good Evening";
+      let defaultSlot = "night";
+      if (hour < 12) {
+        greeting = "Good Morning";
+        defaultSlot = "morning";
+      } else if (hour < 17) {
+        greeting = "Good Afternoon";
+        defaultSlot = "angelus";
+      }
+      document.getElementById("todayGreeting").textContent = greeting;
+
+      const todayKey = getTodaysMysteryKey();
+      const m = MYSTERIES[todayKey];
+      document.getElementById("todayLiturgicalNote").textContent =
+        "Today's Rosary focus: " + m.name + " (" + m.days + ").";
+      document.getElementById("todayMysteryTitle").textContent = m.name;
+
+      selectDailySlot(defaultSlot);
+
+      document.querySelectorAll("#dailyTimePills .pill").forEach(pill => {
+        pill.addEventListener("click", () => selectDailySlot(pill.dataset.slot));
+      });
+
+      document.getElementById("goToRosaryBtn").addEventListener("click", () => {
+        state.mysteryKey = todayKey;
+        document.getElementById("mysterySelect").value = todayKey;
+        localStorage.setItem("ora_mystery", todayKey);
+        renderRosary();
+        switchTab("rosary");
+      });
+    }
+
+    function selectDailySlot(slotKey) {
+      const slot = DAILY_SLOTS[slotKey];
+      document.getElementById("dailyPrayerTitle").textContent = slot.title;
+      document.getElementById("dailyPrayerBody").textContent = slot.text;
+      document.querySelectorAll("#dailyTimePills .pill").forEach(p => {
+        p.classList.toggle("active", p.dataset.slot === slotKey);
+      });
+    }
+
+    // ---------- ROSARY ENGINE ----------
+    function buildRosarySteps(mysteryKey) {
+      const m = MYSTERIES[mysteryKey];
+      const steps = [
+        { label: "Intro • Crucifix", title: "Sign of the Cross", text: CORE.signOfCross },
+        { label: "Intro • Crucifix", title: "The Apostles' Creed", text: CORE.creed },
+        { label: "Intro • First Large Bead", title: "Our Father", banner: "For the intentions of our Holy Father, the Pope.", text: CORE.ourFather },
+        { label: "Intro • Small Bead 1 of 3", title: "Hail Mary", banner: "For an increase in Faith.", text: CORE.hailMary },
+        { label: "Intro • Small Bead 2 of 3", title: "Hail Mary", banner: "For an increase in Hope.", text: CORE.hailMary },
+        { label: "Intro • Small Bead 3 of 3", title: "Hail Mary", banner: "For an increase in Charity.", text: CORE.hailMary },
+        { label: "Intro • Closing", title: "Glory Be", text: CORE.gloryBe }
+      ];
+
+      m.decades.forEach((dec, idx) => {
+        const dNum = idx + 1;
+        steps.push({
+          label: `Decade ${dNum} of 5 • Large Bead`,
+          title: dec.title,
+          banner: dec.fruit,
+          text: CORE.ourFather,
+          decade: dNum,
+          decadeBead: 0
+        });
+        for (let b = 1; b <= 10; b++) {
+          steps.push({
+            label: `Decade ${dNum} of 5 • Bead ${b} of 10`,
+            title: "Hail Mary",
+            banner: `${dec.title} — ${dec.fruit}`,
+            text: CORE.hailMary,
+            decade: dNum,
+            decadeBead: b
+          });
+        }
+        steps.push({
+          label: `End of Decade ${dNum}`,
+          title: "Glory Be & Fatima Prayer",
+          banner: dec.title,
+          text: CORE.gloryBe + "\n\n" + CORE.fatima,
+          decade: dNum,
+          decadeBead: 11
+        });
+      });
+
+      steps.push(
+        { label: "Closing • Centerpiece", title: "Hail, Holy Queen", text: CORE.hailHolyQueen },
+        { label: "Closing Prayer", title: "Concluding Prayer", text: CORE.rosaryClosing }
+      );
+      return steps;
+    }
+
+    function renderRosary() {
+      const steps = buildRosarySteps(state.mysteryKey);
+      if (state.rosaryStep >= steps.length) state.rosaryStep = steps.length - 1;
+      if (state.rosaryStep < 0) state.rosaryStep = 0;
+
+      const s = steps[state.rosaryStep];
+      document.getElementById("rosaryBeadLabel").textContent = s.label;
+      document.getElementById("rosaryStepTitle").textContent = s.title;
+      document.getElementById("rosaryStepText").textContent = s.text;
+
+      const bannerEl = document.getElementById("rosaryMysteryBanner");
+      if (s.banner) {
+        bannerEl.textContent = s.banner;
+        bannerEl.style.display = "block";
+      } else {
+        bannerEl.style.display = "none";
+      }
+
+      // Render 10-bead decade tracker
+      const beadsRow = document.getElementById("rosaryBeadsRow");
+      beadsRow.innerHTML = "";
+      if (s.decade) {
+        const ourFatherBead = document.createElement("span");
+        ourFatherBead.className = "bead large " + (s.decadeBead === 0 ? "current" : "done");
+        beadsRow.appendChild(ourFatherBead);
+
+        for (let i = 1; i <= 10; i++) {
+          const bead = document.createElement("span");
+          let cls = "bead";
+          if (s.decadeBead === i) cls += " current";
+          else if (s.decadeBead > i) cls += " done";
+          bead.className = cls;
+          beadsRow.appendChild(bead);
+        }
+      }
+
+      const pct = Math.round(((state.rosaryStep + 1) / steps.length) * 100);
+      document.getElementById("rosaryProgressFill").style.width = pct + "%";
+      document.getElementById("rosaryCounterText").textContent =
+        `Step ${state.rosaryStep + 1} of ${steps.length} (${pct}%)`;
+
+      const nextBtn = document.getElementById("nextBeadBtn");
+      nextBtn.textContent = state.rosaryStep === steps.length - 1 ? "Amen • Start New Rosary" : "Next Bead →";
+
+      localStorage.setItem("ora_rosary_step", state.rosaryStep);
+    }
+
+    function advanceRosary(delta) {
+      const steps = buildRosarySteps(state.mysteryKey);
+      if (delta > 0 && state.rosaryStep === steps.length - 1) {
+        state.rosaryStep = 0;
+      } else {
+        state.rosaryStep = Math.max(0, Math.min(steps.length - 1, state.rosaryStep + delta));
+      }
+      if (state.haptic && navigator.vibrate) {
+        navigator.vibrate(14);
+      }
+      renderRosary();
+    }
+
+    document.getElementById("nextBeadBtn").addEventListener("click", () => advanceRosary(1));
+    document.getElementById("rosaryCard").addEventListener("click", () => advanceRosary(1));
+    document.getElementById("prevBeadBtn").addEventListener("click", () => advanceRosary(-1));
+    document.getElementById("resetRosaryBtn").addEventListener("click", () => {
+      state.rosaryStep = 0;
+      renderRosary();
+    });
+
+    const mysterySelect = document.getElementById("mysterySelect");
+    mysterySelect.value = state.mysteryKey;
+    mysterySelect.addEventListener("change", (e) => {
+      state.mysteryKey = e.target.value;
+      state.rosaryStep = 0;
+      localStorage.setItem("ora_mystery", state.mysteryKey);
+      renderRosary();
+    });
+
+    const hapticBtn = document.getElementById("hapticToggleBtn");
+    function updateHapticLabel() {
+      hapticBtn.textContent = "Vibration: " + (state.haptic ? "On" : "Off");
+    }
+    updateHapticLabel();
+    hapticBtn.addEventListener("click", () => {
+      state.haptic = !state.haptic;
+      localStorage.setItem("ora_haptic", state.haptic);
+      updateHapticLabel();
+    });
+
+    // ---------- LIBRARY & INTENTIONS ----------
+    function renderLibrary(query = "") {
+      const container = document.getElementById("prayerListContainer");
+      const q = query.trim().toLowerCase();
+      const filtered = PRAYERS_LIBRARY.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.text.toLowerCase().includes(q)
+      );
+
+      if (!filtered.length) {
+        container.innerHTML = `<p class="muted" style="margin:6px 0;">No prayers matched "${q}".</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((p, idx) => `
+        <div class="prayer-item ${q ? "open" : ""}" data-idx="${idx}">
+          <div class="prayer-item-header">
+            <div>
+              <span class="prayer-item-cat">${p.category}</span>
+              <h3 class="prayer-item-title">${p.title}</h3>
+            </div>
+            <span class="muted">▾</span>
+          </div>
+          <div class="prayer-item-content">
+            <div class="prayer-body">${p.text}</div>
+          </div>
+        </div>
+      `).join("");
+
+      container.querySelectorAll(".prayer-item-header").forEach(hdr => {
+        hdr.addEventListener("click", () => {
+          hdr.parentElement.classList.toggle("open");
+        });
+      });
+    }
+
+    document.getElementById("prayerSearch").addEventListener("input", (e) => {
+      renderLibrary(e.target.value);
+    });
+
+    function renderIntentions() {
+      const container = document.getElementById("intentionsListContainer");
+      if (!state.intentions.length) {
+        container.innerHTML = `<p class="muted" style="margin:6px 0;">No intentions added yet. Add someone to keep in your prayers above.</p>`;
+        return;
+      }
+      container.innerHTML = state.intentions.map((item, idx) => `
+        <div class="intention-row">
+          <input type="checkbox" ${item.answered ? "checked" : ""} data-idx="${idx}" aria-label="Mark answered" />
+          <div class="intention-text ${item.answered ? "answered" : ""}">
+            ${escapeHtml(item.text)}
+            <span class="intention-date">Added ${item.date}</span>
+          </div>
+          <button class="delete-btn" data-del="${idx}" type="button" aria-label="Delete intention">✕</button>
+        </div>
+      `).join("");
+
+      container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener("change", () => {
+          const i = parseInt(cb.dataset.idx, 10);
+          state.intentions[i].answered = cb.checked;
+          saveIntentions();
+          renderIntentions();
+        });
+      });
+
+      container.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = parseInt(btn.dataset.del, 10);
+          state.intentions.splice(i, 1);
+          saveIntentions();
+          renderIntentions();
+        });
+      });
+    }
+
+    function saveIntentions() {
+      localStorage.setItem("ora_intentions", JSON.stringify(state.intentions));
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    document.getElementById("intentionForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("intentionInput");
+      const text = input.value.trim();
+      if (!text) return;
+      state.intentions.unshift({
+        text,
+        answered: false,
+        date: new Date().toLocaleDateString(undefined, { day: "numeric", month: "short" })
+      });
+      saveIntentions();
+      input.value = "";
+      renderIntentions();
+    });
+
+    const segLib = document.getElementById("segLibraryBtn");
+    const segInt = document.getElementById("segIntentionsBtn");
+    segLib.addEventListener("click", () => {
+      segLib.classList.add("active");
+      segInt.classList.remove("active");
+      document.getElementById("libraryView").style.display = "block";
+      document.getElementById("intentionsView").style.display = "none";
+    });
+    segInt.addEventListener("click", () => {
+      segInt.classList.add("active");
+      segLib.classList.remove("active");
+      document.getElementById("libraryView").style.display = "none";
+      document.getElementById("intentionsView").style.display = "block";
+    });
+
+    // ---------- PWA SERVICE WORKER & INSTALL ----------
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = "inline-flex";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
+
+    // ---------- BOOT ----------
+    applyTheme();
+    applyFontSize();
+    initTodayTab();
+    renderRosary();
+    renderLibrary();
+    renderIntentions();
+  </script>
+</body>
+</html>
