@@ -1,1 +1,25 @@
-
+{
+  "name": "Ora — Catholic Prayer",
+  "short_name": "Ora",
+  "description": "Daily Catholic Prayers, Interactive Rosary & Private Intentions",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f4ec",
+  "theme_color": "#7c5c2b",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
