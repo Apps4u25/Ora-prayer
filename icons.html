@@ -1,1 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download Ora Icons</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; background: #f8f4ec; color: #2a241d; text-align: center; }
+    button { display: block; width: 100%; max-width: 320px; margin: 12px auto; padding: 14px; border: none; border-radius: 12px; background: #8b6528; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    canvas { border-radius: 24px; margin: 12px auto; display: block; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body>
+  <h2>Ora App Icon Maker</h2>
+  <p>Tap both buttons to save the icons to your phone, then upload them to GitHub.</p>
+  <canvas id="preview" width="192" height="192"></canvas>
+  <button onclick="downloadIcon(192)">1. Download icon-192.png</button>
+  <button onclick="downloadIcon(512)">2. Download icon-512.png</button>
 
+  <script>
+    function drawIcon(canvas, size) {
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "#7c5c2b";
+      ctx.fillRect(0, 0, size, size);
+
+      ctx.strokeStyle = "#e8d6b3";
+      ctx.lineWidth = size * 0.03;
+      const pad = size * 0.1;
+      ctx.strokeRect(pad, pad, size - pad * 2, size - pad * 2);
+
+      ctx.fillStyle = "#fff8eb";
+      const barW = size * 0.11;
+      const vH = size * 0.52;
+      const hW = size * 0.36;
+      const cx = size / 2;
+      const cy = size * 0.48;
+
+      ctx.fillRect(cx - barW / 2, cy - vH * 0.42, barW, vH);
+      ctx.fillRect(cx - hW / 2, cy - vH * 0.15, hW, barW);
+    }
+
+    drawIcon(document.getElementById("preview"), 192);
+
+    function downloadIcon(size) {
+      const c = document.createElement("canvas");
+      drawIcon(c, size);
+      const a = document.createElement("a");
+      a.download = `icon-${size}.png`;
+      a.href = c.toDataURL("image/png");
+      a.click();
+    }
+  </script>
+</body>
+</html>
